@@ -1,5 +1,5 @@
 """
-<a href="./prompt-1-result.md">Prompt 1 Result</a>
+<a href="../prompt-1-result.md">Prompt 1 Result</a>
 """
 
 # Based on this context, create step-by-step markdown files of implementation:
