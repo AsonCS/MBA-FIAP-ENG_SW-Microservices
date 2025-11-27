@@ -1,7 +1,3 @@
-Here is the comprehensive specification for your micro-services project, formatted as a detailed Markdown file suitable for use as context in GenAI prompts.
-
------
-
 # Project Specification: Micro-Services Content Platform
 
 ## 1\. Project Overview
@@ -298,7 +294,3 @@ Steps:
   * **Bounded Contexts:** Strictly separated by service (`backend` handles User context, `feed` handles Display context).
   * **Ubiquitous Language:** Use consistent terms (e.g., "Subject", "Post", "Feed") across code and DB.
   * **Anti-Corruption Layer:** The `feed` service interprets Kafka JSON messages (from Backend) and converts them into its own Domain Model before HTML generation.
-
------
-
-**Would you like me to proceed by generating the `docker-compose.yaml` file based on this specification?**
