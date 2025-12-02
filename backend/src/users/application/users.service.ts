@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User } from '../domain/user.entity';
 import { UserRepository } from '../infrastructure/user.repository';
-import { AuthService } from '../../auth/application/auth.service';
+import { PasswordService } from '../../shared/services/password.service';
 import { Username } from '../domain/value-objects/username.vo';
 
 /**
@@ -36,7 +36,7 @@ export class UserResponseDto {
 export class UsersService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly authService: AuthService,
+    private readonly passwordService: PasswordService,
   ) {}
 
   /**
@@ -69,7 +69,7 @@ export class UsersService {
     }
 
     // Hash password
-    const hashedPassword = await this.authService.hashPassword(password);
+    const hashedPassword = await this.passwordService.hash(password);
 
     // Create and persist user
     const user = new User({
@@ -150,7 +150,7 @@ export class UsersService {
           'Password must be at least 6 characters long',
         );
       }
-      updateData.password = await this.authService.hashPassword(
+      updateData.password = await this.passwordService.hash(
         updates.password,
       );
     }

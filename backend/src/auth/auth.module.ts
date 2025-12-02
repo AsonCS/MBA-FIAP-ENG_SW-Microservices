@@ -5,6 +5,7 @@ import { AuthService } from './application/auth.service';
 import { JwtStrategy } from './infrastructure/jwt.strategy';
 import { AuthController } from './interfaces/auth.controller';
 import { UsersModule } from '../users/users.module';
+import { CommonModule } from '../shared/common.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from '../users/users.module';
       signOptions: { expiresIn: '24h' },
     }),
     UsersModule,
+    CommonModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

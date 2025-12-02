@@ -24,6 +24,8 @@ import { User } from './users/domain/user.entity';
       entities: [User],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV === 'development',
+      retryAttempts: 3,
+      retryDelay: 3000,
     }),
     AuthModule,
     UsersModule,

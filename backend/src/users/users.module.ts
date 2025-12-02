@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './domain/user.entity';
 import { UserRepository } from './infrastructure/user.repository';
 import { UsersService } from './application/users.service';
-import { AuthModule } from '../auth/auth.module';
 import { UsersController } from './interfaces/users.controller';
+import { CommonModule } from '../shared/common.module';
 
 /**
  * UsersModule
@@ -12,7 +12,7 @@ import { UsersController } from './interfaces/users.controller';
  * Follows DDD bounded context principle
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), AuthModule],
+  imports: [TypeOrmModule.forFeature([User]), CommonModule],
   controllers: [UsersController],
   providers: [UserRepository, UsersService],
   exports: [UsersService, UserRepository],

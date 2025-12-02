@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../users/domain/user.entity';
+import { PasswordService } from '../../shared/services/password.service';
 
 /**
  * AuthService
@@ -9,7 +10,10 @@ import { User } from '../../users/domain/user.entity';
  */
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly passwordService: PasswordService,
+  ) {}
 
   /**
    * Validate user credentials by comparing password
@@ -22,11 +26,7 @@ export class AuthService {
       return false;
     }
 
-    try {
-      return await bcrypt.compare(password, user.password);
-    } catch (error) {
-      return false;
-    }
+    return await this.passwordService.compare(password, user.password);
   }
 
   /**
@@ -53,8 +53,7 @@ export class AuthService {
    * @returns Hashed password
    */
   async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
+    return this.passwordService.hash(password);
   }
 
   /**
