@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "react-hot-toast": "^2.6.0"
+  },
+  "devDependencies": {
+    "cypress": "^15.7.1"
+  }
+}

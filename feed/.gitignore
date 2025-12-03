@@ -1,0 +1,24 @@
+# Gradle
+.gradle
+build/
+out/
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.sw*
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kotlin
+.kotlin
+
+# Logs
+*.log

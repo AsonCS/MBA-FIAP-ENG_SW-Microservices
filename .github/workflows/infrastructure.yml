@@ -1,0 +1,133 @@
+name: Infrastructure Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker-compose.yaml'
+      - '.env.example'
+      - '.github/workflows/infrastructure.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docker-compose.yaml'
+      - '.env.example'
+
+jobs:
+  validate-docker-compose:
+    runs-on: ubuntu-latest
+    name: Validate Docker Compose Configuration
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yaml syntax
+        run: |
+          docker-compose config --quiet
+        env:
+          COMPOSE_FILE: docker-compose.yaml
+
+      - name: Check required services
+        run: |
+          echo "Checking for required services in docker-compose.yaml..."
+          
+          # Check for db service
+          if grep -q "db:" docker-compose.yaml; then
+            echo "✓ 'db' service found"
+          else
+            echo "✗ 'db' service not found"
+            exit 1
+          fi
+          
+          # Check for zookeeper service
+          if grep -q "zookeeper:" docker-compose.yaml; then
+            echo "✓ 'zookeeper' service found"
+          else
+            echo "✗ 'zookeeper' service not found"
+            exit 1
+          fi
+          
+          # Check for kafka service
+          if grep -q "kafka:" docker-compose.yaml; then
+            echo "✓ 'kafka' service found"
+          else
+            echo "✗ 'kafka' service not found"
+            exit 1
+          fi
+          
+          # Check for app-network
+          if grep -q "app-network:" docker-compose.yaml; then
+            echo "✓ 'app-network' found"
+          else
+            echo "✗ 'app-network' not found"
+            exit 1
+          fi
+          
+          echo "All required services and networks are present!"
+
+      - name: Check healthchecks
+        run: |
+          echo "Verifying healthchecks are configured..."
+          
+          # Count healthcheck entries
+          HEALTHCHECK_COUNT=$(grep -c "healthcheck:" docker-compose.yaml || true)
+          echo "Found $HEALTHCHECK_COUNT healthchecks configured"
+          
+          if [ "$HEALTHCHECK_COUNT" -lt 3 ]; then
+            echo "Warning: Expected at least 3 healthchecks (db, zookeeper, kafka)"
+          fi
+
+      - name: Validate .env.example
+        run: |
+          echo "Validating .env.example..."
+          
+          if [ ! -f ".env.example" ]; then
+            echo "✗ .env.example not found"
+            exit 1
+          fi
+          
+          # Check for required environment variables
+          if grep -q "MYSQL_ROOT_PASSWORD" .env.example; then
+            echo "✓ MYSQL_ROOT_PASSWORD found"
+          else
+            echo "✗ MYSQL_ROOT_PASSWORD not found"
+            exit 1
+          fi
+          
+          if grep -q "MYSQL_DATABASE" .env.example; then
+            echo "✓ MYSQL_DATABASE found"
+          else
+            echo "✗ MYSQL_DATABASE not found"
+            exit 1
+          fi
+          
+          if grep -q "KAFKA_BROKER" .env.example; then
+            echo "✓ KAFKA_BROKER found"
+          else
+            echo "✗ KAFKA_BROKER not found"
+            exit 1
+          fi
+          
+          echo ".env.example validation passed!"
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: validate-docker-compose
+    name: Validation Summary
+    if: always()
+    
+    steps:
+      - name: Print Summary
+        run: |
+          echo "========================================="
+          echo "Infrastructure Validation Summary"
+          echo "========================================="
+          if [ "${{ needs.validate-docker-compose.result }}" == "success" ]; then
+            echo "✓ All infrastructure checks passed"
+          else
+            echo "✗ Some infrastructure checks failed"
+            exit 1
+          fi

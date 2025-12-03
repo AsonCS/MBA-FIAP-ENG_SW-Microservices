@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+# Ensure Gradle is available
+if ! command -v gradle &> /dev/null; then
+    echo "Installing Gradle wrapper..."
+    # Download and extract gradle
+    GRADLE_VERSION="8.4"
+    GRADLE_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
+    GRADLE_HOME="${HOME}/.gradle/versions/gradle-${GRADLE_VERSION}"
+    
+    if [ ! -d "$GRADLE_HOME" ]; then
+        mkdir -p "${HOME}/.gradle/versions"
+        TEMP_ZIP=$(mktemp)
+        curl -L "$GRADLE_URL" -o "$TEMP_ZIP"
+        unzip -q "$TEMP_ZIP" -d "${HOME}/.gradle/versions"
+        rm "$TEMP_ZIP"
+    fi
+    
+    export PATH="$GRADLE_HOME/bin:$PATH"
+fi
+
+# Run gradle
+gradle "$@"
