@@ -9,16 +9,16 @@ interface FeedFrameProps {
 
 const FeedFrame: React.FC<FeedFrameProps> = ({ subject }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [currentSrc, setCurrentSrc] = useState('');
+  const [currentSrc, setCurrentSrc] = useState(getFeedUrl(subject));
 
   const generateSrc = (sub: string) => {
     const timestamp = new Date().getTime();
     return `${getFeedUrl(sub)}?t=${timestamp}`;
   };
 
-  useEffect(() => {
-    setCurrentSrc(generateSrc(subject));
-  }, [subject]);
+  // useEffect(() => {
+  //   setCurrentSrc(generateSrc(subject));
+  // }, [subject]);
 
   const handleRefresh = () => {
     setCurrentSrc(generateSrc(subject));

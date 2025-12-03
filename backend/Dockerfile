@@ -49,12 +49,13 @@ RUN chown -R nodejs:nodejs /app
 USER nodejs
 
 # Expose application port
-EXPOSE 3000
+EXPOSE 3001
+ENV PORT=3001
 
 # Health check - validates that the application is running
 # Checks if the Swagger UI is accessible
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/docs', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+  CMD node -e "require('http').get('http://localhost:3001/api/docs', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

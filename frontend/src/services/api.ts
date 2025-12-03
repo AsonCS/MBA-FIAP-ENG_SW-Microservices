@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-const FEED_URL = process.env.NEXT_PUBLIC_FEED_URL;
+const BACKEND_URL = 'http://localhost' // process.env.NEXT_PUBLIC_BACKEND_URL;
+const FEED_URL = 'http://localhost/feed' // process.env.NEXT_PUBLIC_FEED_URL;
 
 const backendApi = axios.create({
   baseURL: BACKEND_URL,

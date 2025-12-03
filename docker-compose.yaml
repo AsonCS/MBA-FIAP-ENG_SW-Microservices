@@ -84,7 +84,7 @@ services:
         condition: service_started
     environment:
       NODE_ENV: ${NODE_ENV:-development}
-      PORT: 3000
+      PORT: 3001
       DB_HOST: db
       DB_PORT: 3306
       DB_USERNAME: ${DB_USERNAME:-root}
@@ -97,7 +97,7 @@ services:
     networks:
       - app-network
     ports:
-      - "3001:3000"
+      - "3001:3001"
     restart: unless-stopped
     volumes:
       - ./backend/src:/app/src:ro
@@ -136,18 +136,16 @@ services:
     depends_on:
       - backend
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
-      NEXT_PUBLIC_BACKEND_URL: http://localhost/api
-      NEXT_PUBLIC_FEED_URL: http://localhost/feed/api
+      NEXT_PUBLIC_BACKEND_URL: http://localhost
+      NEXT_PUBLIC_FEED_URL: http://localhost/feed
     networks:
       - app-network
     ports:
       - "3000:3000"
-    restart: unless-stopped
     volumes:
       - ./frontend:/app
-      - /app/node_modules
 
   nginx:
     image: nginx:latest
