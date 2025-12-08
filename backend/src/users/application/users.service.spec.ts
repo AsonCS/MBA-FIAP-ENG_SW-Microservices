@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { UsersService, CreateUserDto, UserResponseDto } from './users.service';
 import { UserRepository } from '../infrastructure/user.repository';
-import { AuthService } from '../../auth/application/auth.service';
+import { PasswordService } from '../../shared/services/password.service';
 import { User } from '../domain/user.entity';
 
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: UserRepository;
-  let authService: AuthService;
+  let passwordService: PasswordService;
 
   const mockUser: User = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -33,11 +33,9 @@ describe('UsersService', () => {
     existsByUsername: jest.fn(),
   };
 
-  const mockAuthService = {
-    hashPassword: jest.fn(),
-    validateUser: jest.fn(),
-    login: jest.fn(),
-    verifyToken: jest.fn(),
+  const mockPasswordService = {
+    hash: jest.fn(),
+    compare: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -49,15 +47,15 @@ describe('UsersService', () => {
           useValue: mockUserRepository,
         },
         {
-          provide: AuthService,
-          useValue: mockAuthService,
+          provide: PasswordService,
+          useValue: mockPasswordService,
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     userRepository = module.get<UserRepository>(UserRepository);
-    authService = module.get<AuthService>(AuthService);
+    passwordService = module.get<PasswordService>(PasswordService);
   });
 
   afterEach(() => {
@@ -72,7 +70,7 @@ describe('UsersService', () => {
       };
 
       mockUserRepository.existsByUsername.mockResolvedValue(false);
-      mockAuthService.hashPassword.mockResolvedValue(
+      mockPasswordService.hash.mockResolvedValue(
         '$2b$10$hashedpassword123',
       );
       mockUserRepository.create.mockResolvedValue(mockUser);
@@ -80,7 +78,7 @@ describe('UsersService', () => {
       const result = await service.create(createUserDto);
 
       expect(userRepository.existsByUsername).toHaveBeenCalledWith('newuser');
-      expect(authService.hashPassword).toHaveBeenCalledWith('password123');
+      expect(passwordService.hash).toHaveBeenCalledWith('password123');
       expect(userRepository.create).toHaveBeenCalled();
       expect(result).toEqual(mockUserResponseDto);
       expect((result as any).password).toBeUndefined();
@@ -206,7 +204,10 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return all users as DTOs', async () => {
-      const mockUsers = [mockUser, { ...mockUser, id: 'id2', username: 'user2' }];
+      const mockUsers = [
+        mockUser,
+        { ...mockUser, id: 'id2', username: 'user2' },
+      ];
       mockUserRepository.findAll.mockResolvedValue(mockUsers);
 
       const result = await service.findAll();
@@ -246,14 +247,12 @@ describe('UsersService', () => {
 
     it('should update user password', async () => {
       const updates = { password: 'newpassword123' };
-      mockAuthService.hashPassword.mockResolvedValue(
-        '$2b$10$newhashed',
-      );
+      mockPasswordService.hash.mockResolvedValue('$2b$10$newhashed');
       mockUserRepository.update.mockResolvedValue(mockUser);
 
       await service.update(mockUser.id, updates);
 
-      expect(authService.hashPassword).toHaveBeenCalledWith('newpassword123');
+      expect(passwordService.hash).toHaveBeenCalledWith('newpassword123');
       expect(userRepository.update).toHaveBeenCalledWith(mockUser.id, {
         password: '$2b$10$newhashed',
       });

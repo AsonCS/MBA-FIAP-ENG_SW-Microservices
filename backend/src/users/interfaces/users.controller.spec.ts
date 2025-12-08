@@ -1,3 +1,5 @@
+// @typescript-eslint/unbound-method
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { UsersController } from './users.controller';
@@ -74,7 +76,10 @@ describe('UsersController', () => {
 
   describe('findAll', () => {
     it('should return all users', async () => {
-      const mockUsers = [mockUserDto, { ...mockUserDto, id: 'id2', username: 'user2' }];
+      const mockUsers = [
+        mockUserDto,
+        { ...mockUserDto, id: 'id2', username: 'user2' },
+      ];
       mockUsersService.findAll.mockResolvedValue(mockUsers);
 
       const result = await controller.findAll();

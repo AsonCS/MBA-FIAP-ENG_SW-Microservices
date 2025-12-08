@@ -71,10 +71,7 @@ export class SubjectsService {
 
     try {
       // Publish to Kafka
-      await this.kafkaService.publishMessage(
-        subject as SubjectType,
-        payload,
-      );
+      await this.kafkaService.publishMessage(subject, payload);
 
       return {
         success: true,

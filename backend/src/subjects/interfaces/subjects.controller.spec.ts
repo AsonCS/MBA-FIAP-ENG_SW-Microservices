@@ -131,13 +131,11 @@ describe('SubjectsController', () => {
         message: 'Message published',
       });
 
-      await controller.publishMessage(
-        'sports',
-        publishMessageDto,
-        mockRequest,
-      );
+      await controller.publishMessage('sports', publishMessageDto, mockRequest);
 
-      expect(usersService.findOne).toHaveBeenCalledWith(mockRequest.user.userId);
+      expect(usersService.findOne).toHaveBeenCalledWith(
+        mockRequest.user.userId,
+      );
     });
   });
 });

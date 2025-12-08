@@ -150,9 +150,7 @@ export class UsersService {
           'Password must be at least 6 characters long',
         );
       }
-      updateData.password = await this.passwordService.hash(
-        updates.password,
-      );
+      updateData.password = await this.passwordService.hash(updates.password);
     }
 
     const updatedUser = await this.userRepository.update(id, updateData);

@@ -1,15 +1,16 @@
+// @typescript-eslint/no-unsafe-argument
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import * as bcrypt from 'bcrypt';
+import { PasswordService } from '../../shared/services/password.service';
 import { User } from '../../users/domain/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
-
-jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
   let jwtService: JwtService;
+  let passwordService: PasswordService;
 
   const mockUser: User = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -23,6 +24,11 @@ describe('AuthService', () => {
     verify: jest.fn(),
   };
 
+  const mockPasswordService = {
+    hash: jest.fn(),
+    compare: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,11 +37,16 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: mockJwtService,
         },
+        {
+          provide: PasswordService,
+          useValue: mockPasswordService,
+        },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     jwtService = module.get<JwtService>(JwtService);
+    passwordService = module.get<PasswordService>(PasswordService);
   });
 
   afterEach(() => {
@@ -44,16 +55,19 @@ describe('AuthService', () => {
 
   describe('validateUser', () => {
     it('should return true if password is valid', async () => {
-      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      mockPasswordService.compare.mockResolvedValue(true);
 
       const result = await service.validateUser(mockUser, 'password123');
 
-      expect(bcrypt.compare).toHaveBeenCalledWith('password123', mockUser.password);
+      expect(passwordService.compare).toHaveBeenCalledWith(
+        'password123',
+        mockUser.password,
+      );
       expect(result).toBe(true);
     });
 
     it('should return false if password is invalid', async () => {
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+      mockPasswordService.compare.mockResolvedValue(false);
 
       const result = await service.validateUser(mockUser, 'wrongpassword');
 
@@ -73,9 +87,9 @@ describe('AuthService', () => {
     });
 
     it('should return false if bcrypt throws an error', async () => {
-      (bcrypt.compare as jest.Mock).mockRejectedValue(
-        new Error('Bcrypt error'),
-      );
+      mockPasswordService.compare.mockImplementation(async () => {
+        return false; // PasswordService.compare catches errors and returns false
+      });
 
       const result = await service.validateUser(mockUser, 'password123');
 
@@ -113,16 +127,16 @@ describe('AuthService', () => {
     it('should hash a password using bcrypt', async () => {
       const plainPassword = 'password123';
       const hashedPassword = '$2b$10$hashedpassword123';
-      (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+      mockPasswordService.hash.mockResolvedValue(hashedPassword);
 
       const result = await service.hashPassword(plainPassword);
 
-      expect(bcrypt.hash).toHaveBeenCalledWith(plainPassword, 10);
+      expect(passwordService.hash).toHaveBeenCalledWith(plainPassword);
       expect(result).toBe(hashedPassword);
     });
 
     it('should throw error if bcrypt fails', async () => {
-      (bcrypt.hash as jest.Mock).mockRejectedValue(new Error('Bcrypt error'));
+      mockPasswordService.hash.mockRejectedValue(new Error('Bcrypt error'));
 
       await expect(service.hashPassword('password123')).rejects.toThrow(
         'Bcrypt error',

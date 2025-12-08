@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from '../application/auth.service';
 import { UsersService } from '../../users/application/users.service';
@@ -28,7 +23,8 @@ export class AuthController {
   @Post('login')
   @ApiOperation({
     summary: 'User login',
-    description: 'Authenticate user with username and password, returns JWT token',
+    description:
+      'Authenticate user with username and password, returns JWT token',
   })
   @ApiBody({
     type: LoginDto,
@@ -68,10 +64,7 @@ export class AuthController {
     }
 
     // Validate password
-    const isPasswordValid = await this.authService.validateUser(
-      user,
-      password,
-    );
+    const isPasswordValid = await this.authService.validateUser(user, password);
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid credentials');
     }

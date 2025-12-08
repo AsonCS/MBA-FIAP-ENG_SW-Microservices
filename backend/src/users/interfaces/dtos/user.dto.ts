@@ -4,7 +4,6 @@ import {
   MinLength,
   MaxLength,
   Matches,
-  IsOptional,
 } from 'class-validator';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 

@@ -1,3 +1,5 @@
+// @typescript-eslint/no-unsafe-member-access
+
 import {
   Controller,
   Post,
@@ -113,7 +115,8 @@ export class UsersController {
   })
   @ApiOperation({
     summary: 'Get user by ID',
-    description: 'Retrieve specific user details by ID (requires authentication)',
+    description:
+      'Retrieve specific user details by ID (requires authentication)',
   })
   @ApiResponse({
     status: 200,
