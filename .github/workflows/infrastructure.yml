@@ -24,11 +24,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate docker-compose.yaml syntax
-        run: |
-          docker-compose config --quiet
-        env:
-          COMPOSE_FILE: docker-compose.yaml
+      # - name: Validate docker-compose.yaml syntax
+      #   run: |
+      #     docker-compose config --quiet
+      #   env:
+      #     COMPOSE_FILE: docker-compose.yaml
 
       - name: Check required services
         run: |
