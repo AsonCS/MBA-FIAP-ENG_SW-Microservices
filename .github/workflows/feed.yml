@@ -116,16 +116,16 @@ jobs:
       - name: Generate Docker image metadata
         id: meta
         run: |
-          DOCKER_IMAGE="${{ env.REGISTRY }}/${{ github.repository_owner }}/feed"
+          DOCKER_IMAGE="${{ env.REGISTRY }}/asoncs/feed"
           DOCKER_TAGS=""
           VERSION="dev"
           
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             VERSION="prod-${{ github.sha }}"
-            DOCKER_TAGS="${DOCKER_IMAGE}:${VERSION},${{ env.REGISTRY }}/${{ github.repository_owner }}/feed:latest"
+            DOCKER_TAGS="${DOCKER_IMAGE}:${VERSION},${{ env.REGISTRY }}/asoncs/feed:latest"
           elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
             VERSION="dev-${{ github.sha }}"
-            DOCKER_TAGS="${DOCKER_IMAGE}:${VERSION},${{ env.REGISTRY }}/${{ github.repository_owner }}/feed:develop"
+            DOCKER_TAGS="${DOCKER_IMAGE}:${VERSION},${{ env.REGISTRY }}/asoncs/feed:develop"
           else
             VERSION="ci-${{ github.sha }}"
             DOCKER_TAGS="${DOCKER_IMAGE}:${VERSION}"
@@ -246,7 +246,7 @@ jobs:
       - name: Run Trivy vulnerability scanner (image)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ github.repository_owner }}/feed:${{ needs.build.outputs.version }}
+          image-ref: ${{ env.REGISTRY }}/asoncs/feed:${{ needs.build.outputs.version }}
           format: 'sarif'
           output: 'trivy-image-results.sarif'
         continue-on-error: true
@@ -288,7 +288,7 @@ jobs:
             -p 8080:8080 \
             -e KAFKA_BROKER=kafka:9092 \
             --network host \
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/feed:${{ needs.build.outputs.version }}
+            ${{ env.REGISTRY }}/asoncs/feed:${{ needs.build.outputs.version }}
           
           echo "Waiting for service to start..."
           sleep 10
