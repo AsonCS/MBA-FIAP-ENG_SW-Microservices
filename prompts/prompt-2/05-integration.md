@@ -13,8 +13,8 @@
         * Feed: 8080:8080
         * Frontend: 3001:3000 (or 80:3000)
 
-## Step 2: Cross-Origin Resource Sharing (CORS)
-* **Action:** Update `backend` (NestJS) main.ts to allow CORS from the Frontend URL.
+## Step 2: Create Nginx server configuration
+* **Action:** Create Nginx configuration to allow CORS from the Frontend URL.
 * **Action:** Update `feed` (Ktor) to allow iframe embedding (check X-Frame-Options headers).
 
 ## Step 3: End-to-End Test Script

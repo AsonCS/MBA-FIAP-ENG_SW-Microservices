@@ -1,0 +1,173 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Feed Service API",
+    "description": "Feed Service for the Micro-Feed Platform. Consumes Kafka messages and provides pre-rendered HTML feeds for subjects (sports, healthy, news, food, autos).",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Feed Service Team",
+      "url": "https://github.com/your-org/micro-feed-platform"
+    },
+    "license": {
+      "name": "Apache-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    },
+    {
+      "url": "http://feed:8080",
+      "description": "Docker Compose environment"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Subjects",
+      "description": "Operations related to feed subjects"
+    }
+  ],
+  "paths": {
+    "/api/subjects": {
+      "get": {
+        "summary": "List all available subjects",
+        "description": "Retrieves a list of all available feed subjects with their current message counts.",
+        "operationId": "listSubjects",
+        "tags": [
+          "Subjects"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of subjects",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "description": "HTML page containing list of subjects with links"
+                },
+                "example": "<!DOCTYPE html><html><body><h2>Available Feed Subjects</h2><ul><li><a href=\"/api/subjects/sports\">sports</a></li></ul></body></html>"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subjects/{subject}": {
+      "get": {
+        "summary": "Get feed for a specific subject",
+        "description": "Retrieves the feed (pre-rendered HTML with messages) for a specific subject. Messages are consumed from Kafka and stored in memory.",
+        "operationId": "getFeedBySubject",
+        "tags": [
+          "Subjects"
+        ],
+        "parameters": [
+          {
+            "name": "subject",
+            "in": "path",
+            "required": true,
+            "description": "The subject name/topic",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "sports",
+                "healthy",
+                "news",
+                "food",
+                "autos"
+              ]
+            },
+            "example": "sports"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved feed for subject",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string",
+                  "description": "HTML page containing feed messages as list items"
+                },
+                "example": "<!DOCTYPE html><html><head><title>Sports Feed</title></head><body><h2>Sports Feed</h2><ul><li>[2023-10-10T10:00:00Z] <b>JohnDoe</b>: Great goal!</li></ul></body></html>"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid or missing subject",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Bad Request: invalid subject. Valid subjects are: sports, healthy, news, food, autos"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FeedMessage": {
+        "type": "object",
+        "description": "Message consumed from Kafka and rendered in the feed",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique message identifier (UUID v4)"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "User who posted the message (UUID v4)"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username of the poster"
+          },
+          "content": {
+            "type": "string",
+            "description": "Message content/text"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 formatted timestamp"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "username",
+          "content",
+          "timestamp"
+        ]
+      }
+    }
+  }
+}
